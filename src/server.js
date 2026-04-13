@@ -1461,18 +1461,6 @@ const server = app.listen(PORT, "0.0.0.0", async () => {
   }
 
 
-  // Sync Anthropic API key from env var on every startup.
-  const anthropicApiKey = process.env.ANTHROPIC_API_KEY?.trim();
-  if (isConfigured() && anthropicApiKey) {
-    console.log("[wrapper] syncing anthropic api key in config...");
-    try {
-      await runCmd(OPENCLAW_NODE, clawArgs(["config", "set", "auth.profiles.anthropic:default.apiKey", anthropicApiKey]));
-      console.log("[wrapper] anthropic api key synced");
-    } catch (err) {
-      console.warn(`[wrapper] failed to sync anthropic api key: ${String(err)}`);
-    }
-  }
-  
   
   // Auto-start the gateway if already configured so polling channels (Telegram/Discord/etc.)
   // work even if nobody visits the web UI.
