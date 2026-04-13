@@ -1447,6 +1447,19 @@ const server = app.listen(PORT, "0.0.0.0", async () => {
     }
   }
 
+  // Sync Telegram bot token from env var on every startup.
+  // Lets you manage the secret via Railway Variables instead of the config file.
+  const telegramBotToken = process.env.TELEGRAM_BOT_TOKEN?.trim();
+  if (isConfigured() && telegramBotToken) {
+    console.log("[wrapper] syncing telegram bot token in config...");
+    try {
+      await runCmd(OPENCLAW_NODE, clawArgs(["config", "set", "channels.telegram.botToken", telegramBotToken]));
+      console.log("[wrapper] telegram bot token synced");
+    } catch (err) {
+      console.warn(`[wrapper] failed to sync telegram bot token: ${String(err)}`);
+    }
+  }
+  
   // Auto-start the gateway if already configured so polling channels (Telegram/Discord/etc.)
   // work even if nobody visits the web UI.
   if (isConfigured()) {
