@@ -8,9 +8,6 @@ import express from "express";
 import httpProxy from "http-proxy";
 import * as tar from "tar";
 
-// ✨ NUEVO: Rate limiting para no exceder 30k tokens/min de Anthropic
-import { TokenRateLimiter, createRateLimitMiddleware } from "./rate-limiter.js";
-
 // Migrate deprecated CLAWDBOT_* env vars → OPENCLAW_* so existing Railway deployments
 // keep working. Users should update their Railway Variables to use the new names.
 for (const suffix of ["PUBLIC_PORT", "STATE_DIR", "WORKSPACE_DIR", "GATEWAY_TOKEN", "CONFIG_PATH"]) {
@@ -32,9 +29,6 @@ for (const suffix of ["PUBLIC_PORT", "STATE_DIR", "WORKSPACE_DIR", "GATEWAY_TOKE
 //
 // OPENCLAW_PUBLIC_PORT is kept as an escape hatch for non-Railway deployments.
 const PORT = Number.parseInt(process.env.PORT ?? process.env.OPENCLAW_PUBLIC_PORT ?? "3000", 10);
-
-// ✨ NUEVO: Instancia del rate limiter (45k tokens/min = buffer debajo del límite de 50k para Haiku 30k para el resto)
-const tokenLimiter = new TokenRateLimiter(30000);
 
 // State/workspace
 // OpenClaw defaults to ~/.openclaw.
@@ -1371,7 +1365,6 @@ proxy.on("proxyReqWs", (_proxyReq, req) => {
   attachGatewayAuthHeader(req);
 });
 
-app.use(createRateLimitMiddleware(tokenLimiter));
 
 app.use(requireDashboardAuth, async (req, res) => {
   // If not configured, force users to /setup for any non-setup routes.
