@@ -33,8 +33,8 @@ for (const suffix of ["PUBLIC_PORT", "STATE_DIR", "WORKSPACE_DIR", "GATEWAY_TOKE
 // OPENCLAW_PUBLIC_PORT is kept as an escape hatch for non-Railway deployments.
 const PORT = Number.parseInt(process.env.PORT ?? process.env.OPENCLAW_PUBLIC_PORT ?? "3000", 10);
 
-// ✨ NUEVO: Instancia del rate limiter (45k tokens/min = buffer debajo del límite de 50k para Haiku)
-const tokenLimiter = new TokenRateLimiter(45000);
+// ✨ NUEVO: Instancia del rate limiter (45k tokens/min = buffer debajo del límite de 50k para Haiku 30k para el resto)
+const tokenLimiter = new TokenRateLimiter(30000);
 
 // State/workspace
 // OpenClaw defaults to ~/.openclaw.
